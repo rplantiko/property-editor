@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html language="en">
+  <head>
+	  <meta charset="utf-8"/>
+	  <title>Comparing Property Files</title>
+	  <link rel="stylesheet" href="main.css" />
+	  <script src="ui.js"></script>
+    <script src="i18n.js"></script>
+  </head>
+  <body>
+
+    <h1>Comparing Property Files</h1>
+    
+    <div class="input-area">
+      <div>
+        <input type="file" multiple id="property-files">
+        <label class="button" for="property-files" data-action="choose-files">Choose files</label>
+        <div class="additional-info" id="selected-files">No files selected</div>
+      </div>
+      <div id="toolbar">
+        <button data-action="reload">Reload</button>
+        <button data-action="save">Save</button>        
+      </div>
+    </div>
+
+    <div id="table-container"></div>
+   
+    <script src="control.js"></script>
+  </body>
+</html>

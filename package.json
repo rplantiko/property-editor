@@ -1,0 +1,9 @@
+{  
+  "name": "propcmp",  
+  "main": "http://ruediger-plantiko.net/property-editor/?edit",
+  "node-remote": "http://ruediger-plantiko.net",
+  "window": {
+    "width":1800,
+    "height":1200
+  }
+}

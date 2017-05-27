@@ -1,0 +1,85 @@
+body {
+    font-family: Arial;
+    padding:0.5em;
+}
+
+input[type=file] {
+  display:none;
+}
+
+#input-area {
+  white-space:nowrap;
+}
+
+#toolbar {
+  margin-top:5px;
+}
+
+table {
+    margin-top: 1em;
+    padding: 1em;
+    border: solid #C0C0C0 1px;
+    border-collapse: collapse;
+}
+
+table thead td {
+    background-color: palegoldenrod;
+    text-align: left;
+}
+
+table td {
+    border: solid #C0C0C0 1px;
+    position:relative;
+}
+
+table td {
+    padding: 4px 10px;
+    border: solid #C0C0C0 1px;
+}
+
+tbody td:first-child {
+    font-family: monospace;
+    background-color: aliceblue;
+}
+
+button, label.button {
+    background-color: blue;
+    color: white;
+    padding: 4px 8px;
+    font-weight: bold;
+    font-size:11pt;
+    margin: 7px 1px;
+    border: solid gray 1px;
+    cursor:pointer;
+}
+
+td .delete {
+  cursor:pointer;
+  position:absolute;
+  top:1px;
+  right:3px;
+  margin:2px;
+  display:none;
+}
+
+td:hover .delete {
+  display:block;
+}
+
+button[disabled], label.button[disabled] {
+    cursor:default;
+    background-color:#191970;
+    color:lightgray;
+}
+
+td.missing, td.multiple {
+  background-color:red;
+}
+
+td.empty {
+  background-color: orange;
+}
+
+.additional-info {
+  display: inline-block;
+}
