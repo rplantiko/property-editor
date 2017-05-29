@@ -4,7 +4,7 @@
 
    const inputFiles     = document.getElementById("property-files")
    const tableContainer = document.getElementById("table-container")
-   const editMode       = !!document.location.search.match(/\bedit\b/)
+   const editMode       = /\bedit\b/.test(document.location.search)
    var   propList
    
    setHandlers()
