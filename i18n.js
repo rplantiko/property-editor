@@ -66,7 +66,7 @@ Attributes:
 
 +----------+----------------------------------------------------------------------+
 | rows     | Array of PropertyRow's, containing parsed text rows                  |
-| keyMap   | Hashtabelle of all value rows for a given key                        |
+| keyMap   | Hash table of all value rows for a given key                         |
 | dataLoss | Flag: there were changes (virtual property)                          |
 | old      | Referen to original (on changes)                                     |
 +----------+----------------------------------------------------------------------+
@@ -89,6 +89,7 @@ Constructor Parameters
       this.rows = opt.rows ? opt.rows.map(row=>new PropertyRow(row)) : []
       this.keyMap = buildKeyMap(this.rows)
       this.old = null
+      this.fileHandle = opt.fileHandle 
     }
     
 //-----------------------------------------------------------------------    

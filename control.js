@@ -4,7 +4,7 @@
 
    const inputFiles     = document.getElementById("property-files")
    const tableContainer = document.getElementById("table-container")
-   const editMode       = /\bedit\b/.test(document.location.search)
+   const editMode       = ! /\bdisplay\b/.test(document.location.search)
    var   propList
    
    setHandlers()
@@ -19,7 +19,7 @@
         "save": handleSave
      }
      ui.registerHandlers("click",clickHandlers)
-     inputFiles.addEventListener("change",handleChooseFiles)
+     inputFiles.addEventListener("click",handleChooseFiles)
      
      tableContainer.addEventListener("input",handleInput)
      if (editMode) tableContainer.addEventListener("mouseover",handleOnMouseOver)
@@ -48,23 +48,24 @@
 // The user selected some files via button "Choose files"
 // -------------------------------------------------------------------
    function handleChooseFiles(evt) {
-     var files = Array.from(this.files)
-     var status
-     if (files.length) {
-       status = files.map(f=>f.name).join(',')
-       reload(files)
-     }
-     else {
-       status = "No files selected"
-     }
-     document.getElementById("selected-files").textContent = status      
+     window.showOpenFilePicker({multiple:true,mode:"readwrite"}).then(files=>{
+       var status
+       if (files.length) {
+         status = files.map(f=>f.name).join(',')
+         reload(files)
+       }
+       else {
+         status = "No files selected"
+       }
+       document.getElementById("selected-files").textContent = status 
+     });
    }
    
 // -------------------------------------------------------------------
 // The user clicked "Compare"
 // -------------------------------------------------------------------
    function handleReload(evt) {
-     var files = inputFiles.files
+     var files = propList.map(p=>p.fileHandle);
      if (files.length === 0) {
        throw new Error("Bitte Dateien auswählen")
      }
@@ -74,8 +75,8 @@
 // -------------------------------------------------------------------
 // Read the given files, compare and display them
 // -------------------------------------------------------------------
-   function reload(files) {
-     readFiles(files).then(pList=>{
+   function reload(fileHandles) {
+     readFiles(fileHandles).then(pList=>{
        compare(pList)
      }).then(fieldSelection)
    }     
@@ -93,7 +94,6 @@
 
 // -------------------------------------------------------------------
 // Restore the objects' state before change (discard changes)
-// (Currently unused)
 // -------------------------------------------------------------------
   function handleRestore() {
     propList.forEach(p=>p.restore())
@@ -236,42 +236,35 @@
 // -------------------------------------------------------------------
   function handleSave() {
     if (editMode) {
-      save(propList,inputFiles.files).then(fieldSelection())
+      save(propList).then(()=>{
+        handleReload();   // Todo - can be optimized, without redundantly re-reading the files 
+        fieldSelection()
+      });
     }
   }
 
 // -------------------------------------------------------------------
 // Save all files that have been changed by the user 
 // -------------------------------------------------------------------
-  function save(propList,files) {
+  async function save(propList) {
     return Promise.all( 
       propList
-        .map((p,i)=>[p,files[i]])
-        .filter(pf=>pf[0].dataLoss)
-        .map(
-          pf=>saveFile(pf[0],pf[1])
-        )
+        .filter(p=>p.dataLoss)
+        .map(p=>saveFile(p))
     )
   }  
  
 // -------------------------------------------------------------------
-// Promise to save a single file using fs
+// Promise to save a single file 
 // -------------------------------------------------------------------
-  function saveFile(properties,file) {
-    const fs = require("fs")
-    return new Promise(function(resolve,reject) {
-      if (file.path != '') {
-        var content = properties.stripErrors().sort().toString()      
-        fs.writeFile(file.path, content, err=>{
-          if (err) {
-            reject(err)
-          } else {
-            properties.onCommit()
-            resolve(properties)
-          }
-        }) 
-      }
-    })
+  async function saveFile(properties) {
+    const fileHandle = properties.fileHandle
+    if (fileHandle) {
+      var content = properties.stripErrors().sort().toString()      
+      const writable = await fileHandle.createWritable() 
+      await writable.write(content)
+      await writable.close()
+    }  
   }
 
 // -------------------------------------------------------------------
@@ -287,24 +280,19 @@
 // -------------------------------------------------------------------
 
 // Promise to read and parse all the specified property files
-   function readFiles(files) {
-     var aFiles = Array.from(files)
-     return Promise.all(aFiles.map(file=>parsePropertyFile(file)))
+   function readFiles(fileHandles) {
+     return Promise.all(fileHandles.map(fh=>parsePropertyFile(fh)))
    }
 
 // -------------------------------------------------------------------
 // Read and parse a single property file
 // -------------------------------------------------------------------
-  function parsePropertyFile(file) {
-    return new Promise((resolve,reject)=>{
-      var rdr = new FileReader()
-      rdr.addEventListener("load",(evt)=>{
-        var rows = rdr.result.split(/\r\n?|\n/)
-        var prop = new i18n.Properties({name:file.name,rows:rows})
-        resolve(prop)
-      })
-      rdr.readAsText(file)
-    })
+  async function parsePropertyFile(fileHandle) {
+    const file = await fileHandle.getFile(); 
+    const content = await file.text( );
+    const rows = content.split(/\r\n?|\n/);
+    const prop =  new i18n.Properties({name:file.name,rows:rows,fileHandle:fileHandle});
+    return prop;
   }   
 
 // -------------------------------------------------------------------
