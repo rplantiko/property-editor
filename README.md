@@ -1,5 +1,5 @@
 # property-editor
-A tool to compare and edit multiple `.properties` files at once, particularly useful when they are used in internationalization as text ressources.
+A tool to compare and edit multiple [`.properties`](https://en.wikipedia.org/wiki/.properties) files at once, particularly useful when they are used in internationalization as text ressources.
 ## Usage
 * Call the web application by opening the link to the main `index.html` page in your browser.
 * Choose one or more `.properties` files using the button `Choose files`.
